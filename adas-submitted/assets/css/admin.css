@@ -1,0 +1,220 @@
+.warning-text {
+  background-color: #ffff0042;
+  border: 1px solid #0066cc;
+  width: 633px;
+  padding: 10px;
+  color: #45515e;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.divi_form_select_id_setting{
+  height: auto;
+  text-align: center;
+  color: #302929;
+  padding-bottom: -4px;
+  padding-top: 8px;
+  background: #fff;
+}
+.label_setting {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 17px;
+  color: #455473e3;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+/* Primary label */
+.label-primary {
+  font-size: 19px;
+  margin-top: 25px;
+  text-align: center;
+  color: #084ad5cf;
+}
+.information-text {
+  width: 500px;
+  color: #656b71;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+input#adas-divi-submit-button {
+  font-size: 14px;
+  background: #2858bae3;
+  color: white;
+}
+
+primary {
+  background-color: #1f2021;
+  font-size: 22px;
+  border-radius: 5%;
+  padding: 12px 55px;
+  border: 2px black solid;
+}
+/* Custom CSS class for input fields */
+.custom-input {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+input.form-control-items_per_page {
+  width: 85px;
+  font-weight: 500;
+  text-align: center;
+  font-size: 15px;
+  color: #33373a;
+}
+
+#form_id_setting {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: #fff; /* Background color */
+  color: #333; /* Text color */
+}
+
+.Enable_data_saving_checkbox {
+  width: 20px;
+  height: 20px;
+  background-color: #fff;
+  border: 1px solid #999;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+
+.Enable_data_saving_checkbox:checked {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+#form_id_setting option:checked {
+  background-color: #337ab7;
+  color: #fff;
+}
+
+#form_id_setting:hover {
+  border-color: #235a9d; 
+}
+
+#form_id_setting:focus {
+  border-color: #235a9d; 
+}
+/* Style the information icon */
+.my-settings-label i.fas.fa-info-circle {
+  font-size: 16px;
+  color: #0073e6; 
+  margin-left: 5px; 
+  cursor: pointer;
+}
+
+/* Style the tooltip */
+.my-settings-label i.fas.fa-info-circle::after {
+  content: attr(title);
+  display: none;
+  position: absolute;
+  background-color: #0073e6; 
+  color: #fff; 
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 9999;
+}
+
+.my-settings-label i.fas.fa-info-circle:hover::after {
+  display: block;
+}
+
+.view-option-label {
+  display: inline-block;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.view-option-label img {
+  border: 2px dotted transparent;
+  transition: border-color 0.3s;
+}
+
+.view-option-label input[type="radio"]:checked + img {
+  border-color: blue;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 20px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 12px;
+  width: 12px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
