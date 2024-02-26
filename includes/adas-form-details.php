@@ -22,7 +22,7 @@ class Adas_form_details {
 	 * Constructor start subpage
 	 */
 	public function __construct() {
-		$this->form_id = $_REQUEST['fid'];
+		$this->form_id = isset( $_REQUEST['fid'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['fid'] ) ) : '';
 		$this->adas_table_page();
 	}
 
@@ -33,7 +33,7 @@ class Adas_form_details {
 <div class="wrap">
     <div id="icon-users" class="icon32"></div>
     <h2>Contact form ID:
-        <?php echo $this->form_id; ?>
+        <?php echo esc_html( $this->form_id ); ?>
     </h2>
     <form method="post" action="">
 
@@ -110,14 +110,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 
 	public function __construct() {
 
-		if ( isset( $_REQUEST['fid'] ) ) {
-			$fid = $_REQUEST['fid'];
-		} elseif ( isset( $_GET['fid'] ) ) {
-			$fid = isset( $_GET['fid'] ) ? $_GET['fid'] : '';
-
-		}
-
-		$this->form_post_id = $fid;
+		$this->form_id = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
 
 		// Set parent defaults.
 		parent::__construct(
@@ -275,8 +268,8 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 
 	// PS to add links to the column create a function with name column_(and the name of the column)
 	protected function column_id( $item ) {
-		$page         = wp_unslash( $_REQUEST['page'] ); // WPCS: Input var ok.
-		$delete_nonce = wp_create_nonce( 'deletentry' );
+		$page       = wp_unslash( $_REQUEST['page'] ); // WPCS: Input var ok.
+		$view_nonce = wp_create_nonce( 'view_action' );
 
 		// Build edit row action.
 		$edit_query_args_v = array(
@@ -297,15 +290,15 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 		// Build delete row action.
 		$delete_query_args = array(
 			'page'   => $page,
-			'action' => 'delete',
+			'action' => 'view',
 			'ufid'   => $item['id'],
 			'fid'    => $_REQUEST['fid'],
 		);
 
-		$actions['delete'] = sprintf(
-			'<a href="%1$s&delete_nonce=%2$s">%3$s</a>',
+		$actions['view'] = sprintf(
+			'<a href="%1$s&view_nonce=%2$s">%3$s</a>',
 			esc_url( add_query_arg( $delete_query_args, 'admin.php' ) ),
-			esc_attr( $delete_nonce ),
+			esc_attr( $view_nonce ),
 			_x( 'Details', 'List table row action', 'wp-list-adas' )
 		);
 
@@ -342,10 +335,10 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 		);
 
 		// Add nonce to delete action
-		$delete_nonce       = wp_create_nonce( 'deletentry' );
+		$view_nonce         = wp_create_nonce( 'deletentry' );
 		$actions['delete'] .= sprintf(
-			'<input type="hidden" name="delete_nonce" value="%s" />',
-			esc_attr( $delete_nonce )
+			'<input type="hidden" name="view_nonce" value="%s" />',
+			esc_attr( $view_nonce )
 		);
 
 		return $actions;
@@ -364,8 +357,8 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 		global $wpdb;
 		$form_id = $this->form_id;
 
-		$table_name   = $wpdb->prefix . 'divi_table';
-		$delete_nonce = isset( $_REQUEST['delete_nonce'] ) ? $_REQUEST['delete_nonce'] : '';
+		$table_name = $wpdb->prefix . 'divi_table';
+		$view_nonce = isset( $_REQUEST['view_nonce'] ) ? $_REQUEST['view_nonce'] : '';
 
 		if ( ! $this->current_action() ) {
 			return;
@@ -373,7 +366,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 
 		if ( 'delete' === $this->current_action() ) {
 
-			if ( ! wp_verify_nonce( $delete_nonce, 'deletentry' ) ) {
+			if ( ! wp_verify_nonce( $view_nonce, 'deletentry' ) ) {
 				wp_die( 'No action taken2' );
 				exit();
 			}

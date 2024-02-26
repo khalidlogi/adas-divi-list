@@ -15,11 +15,11 @@ add_action( 'admin_menu', 'tt_add_menu_items' );
  */
 function tt_add_menu_items() {
 	add_menu_page(
-		__( 'Adas Wp List', 'wp-list-adas' ), // Page title.
+		__( 'Adas Divi Contact fotm DB List', 'wp-list-adas' ), // Page title.
 		__( 'Adas Entries Manager', 'wp-list-adas' ),        // Menu title.
 		'activate_plugins',                                         // Capability.
 		'adas_list',                                             // Menu slug.
-		'tt_render_list_page'                                       // Callback function.
+		'adas_render_list_page'                                       // Callback function.
 	);
 }
 
@@ -32,27 +32,23 @@ function tt_add_menu_items() {
  * so we've instead called those methods explicitly. It keeps things flexible, and
  * it's the way the list tables are used in the WordPress core.
  */
-function tt_render_list_page() {
+function adas_render_list_page() {
 
 	// Getting crasy with this shit
 	// this function is the switch board that will call the correct class
 	// based on the action parameter
 
-	// See what page we are in right now
-	// See what page we are in right now
-	$fid  = isset( $_GET['fid'] ) ? $_GET['fid'] : '';
-	$ufid = isset( $_GET['ufid'] ) ? $_GET['ufid'] : '';
+	// See what page we are in right now.
+	$fid  = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
+	$ufid = isset( $_GET['ufid'] ) ? (int) $_GET['ufid'] : '';
 
 	if ( ! empty( $fid ) && empty( $ufid ) ) {
 		new Adas_form_details();
-		error_log( 'fid is: ' . $fid );
-		print_r( $fid );
 		return;
 	}
 
 	if ( ! empty( $ufid ) && ! empty( $fid ) ) {
 
-		error_log( 'ufid works' );
 		new ADAS_Form_Details_Ufd();
 		return;
 	}
@@ -402,15 +398,8 @@ class Adas_Main_List_Table extends WP_List_Table {
 
 	public function entries_data() {
 		global $wpdb;
-		if ( isset( $_GET['paged'] ) ) {
-			$page = $_GET['paged'];
-		} else {
-			$page = 1;
-		}
 
-		$per_page     = $this->per_page;
-		$form_post_id = '1111222222';
-		$title        = 'title';
+		$title = 'title';
 
 		$results = $wpdb->get_results( "SELECT DISTINCT contact_form_id FROM {$wpdb->prefix}divi_table", ARRAY_A );
 
