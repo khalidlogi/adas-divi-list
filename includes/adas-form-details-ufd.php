@@ -110,7 +110,7 @@ class ADAS_Form_Details_Ufd {
 			'.form-information span {' .
 				'margin-left: 1em;' .
 			'}</style>' .
-		'<div class="adas-form-details-wrap">' .
+		'<div class="adas-form-details-wrapper">' .
 			'<div id="welcome-panel" class="cfdb7-panel">' .
 				'<div class="cfdb7-panel-content">' .
 					'<div class="welcome-panel-column-container">' .

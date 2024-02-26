@@ -228,3 +228,35 @@ input:checked + .slider:before {
   background-color: red;
   color: white;
 }
+
+/* Styles for wp_list_table */
+.adas-form-details-wrapper {
+  position: relative;
+  overflow: auto;
+  margin: 1rem 0;
+  padding: 1.5rem 1rem 0.75rem;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.adas-form-details-wrapper h3 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.adas-form-details-wrapper p {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.adas-form-details-wrapper .form-information span {
+  margin-left: 1em;
+  color: #666;
+  font-weight: bold;
+}
