@@ -193,17 +193,8 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	protected function column_id( $item ) {
 		$view_nonce = wp_create_nonce( 'view_action' );
 
-		// Build edit row action.
-		$edit_query_args_v = array(
-			'page'   => $this->page,
-			'action' => 'edit',
-			'ufid'   => $item['id'],
-			'fid'    => $this->form_id,
-
-		);
-
-		// Build delete row action.
-		$delete_query_args = array(
+		// Build view row action.
+		$view_query_args = array(
 			'page'   => $this->page,
 			'action' => 'view',
 			'ufid'   => $item['id'],
@@ -212,7 +203,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 
 		$actions['view'] = sprintf(
 			'<a href="%1$s&view_nonce=%2$s">%3$s</a>',
-			esc_url( add_query_arg( $delete_query_args, 'admin.php' ) ),
+			esc_url( add_query_arg( $view_query_args, 'admin.php' ) ),
 			esc_attr( $view_nonce ),
 			_x( 'Details', 'List table row action', 'wp-list-adas' )
 		);
@@ -239,10 +230,10 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 		);
 
 		// Add nonce to delete action
-		$view_nonce         = wp_create_nonce( 'deletentry' );
+		$delete_nonce       = wp_create_nonce( 'deletentry' );
 		$actions['delete'] .= sprintf(
-			'<input type="hidden" name="view_nonce" value="%s" />',
-			esc_attr( $view_nonce )
+			'<input type="hidden" name="delete_nonce" value="%s" />',
+			esc_attr( $delete_nonce )
 		);
 
 		return $actions;
@@ -260,30 +251,23 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	protected function process_bulk_action() {
 		global $wpdb;
 		$form_id = $this->form_id;
-		$id      = isset( $_REQUEST['id'] ) ? (int) $_REQUEST['id'] : '';
 		$ids     = isset( $_REQUEST['id'] ) ? wp_parse_id_list( wp_unslash( $_REQUEST['id'] ) ) : array();
 
-		if ( 'delete' === $this->current_action() ) {
-			$view_nonce = isset( $_REQUEST['view_nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['view_nonce'] ) ) : '';
-
-			if ( ! wp_verify_nonce( $view_nonce, 'deletentry' ) ) {
-				wp_die( 'No action taken2' );
-				exit();
-			}
-
-			if ( ! $this->current_action() ) {
-				return;
-			}
-
-			// $ids = $this->get_user_selected_records();
-			if ( is_array( $ids ) ) {
-				$ids = implode( ',', $ids );
-			}
-
-			if ( ! empty( $ids ) ) {
-				$wpdb->query( "DELETE FROM {$wpdb->prefix}divi_table WHERE id IN($ids)" );
-			}
+		if ( empty( $ids ) ) {
+			return;
 		}
+
+		if ( 'delete' !== $this->current_action() ) {
+			return;
+		}
+
+		if ( ! wp_verify_nonce( isset( $_REQUEST['delete_nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['delete_nonce'] ) ) : '', 'deletentry' ) ) {
+			wp_die( 'No action taken' );
+		}
+
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}divi_table WHERE id IN({$placeholders})", $ids ) );
 	}
 
 	/**
@@ -297,7 +281,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	 * @uses $this->get_pagenum()
 	 * @uses $this->set_pagination_args()
 	 */
-	function prepare_items() {
+	public function prepare_items() {
 		global $wpdb; // This is used only if making any database queries
 		$form_id      = $this->form_id;
 		$per_page     = 10;
@@ -336,8 +320,8 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	}
 
 	protected function usort_reorder( $a, $b ) {
-		$orderby = ( ! empty( $_GET['orderby'] ) ) ? $_GET['orderby'] : 'read_status';
-		$order   = ( ! empty( $_GET['order'] ) ) ? $_GET['order'] : 'asc';
+		$orderby = ( ! empty( $_GET['orderby'] ) ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : 'read_status';
+		$order   = ( ! empty( $_GET['order'] ) ) ? sanitize_key( wp_unslash( $_GET['order'] ) ) : 'asc';
 
 		switch ( $orderby ) {
 			case 'read_status':
@@ -346,9 +330,9 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 			case 'id':
 				$result = $a['id'] - $b['id'];
 				break;
-			// Add other column cases here if needed
+			// Add other column cases here if needed.
 			default:
-				return 0; // Return 0 for no sorting
+				return 0; // Return 0 for no sorting.
 		}
 
 		return ( $order === 'asc' ) ? $result : -$result;
@@ -381,14 +365,4 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 
 		return $results;
 	}
-
-
-	/**
-	 * Callback to allow sorting of example data.
-	 *
-	 * @param string $a First value.
-	 * @param string $b Second value.
-	 *
-	 * @return int
-	 */
 }

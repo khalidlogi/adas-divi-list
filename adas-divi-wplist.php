@@ -18,7 +18,8 @@ function tt_add_menu_items() {
 		__( 'Adas Entries Manager', 'wp-list-adas' ),        // Menu title.
 		'activate_plugins',                                         // Capability.
 		'adas_list',                                             // Menu slug.
-		'adas_render_list_page'                                       // Callback function.
+		'adas_render_list_page',                                       // Callback function.
+		'dashicons-list-view' // Dashicon class.
 	);
 }
 
