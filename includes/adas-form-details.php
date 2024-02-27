@@ -71,7 +71,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	public function __construct() {
 
 		$this->form_id = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
-		$this->page    = isset( $_REQUEST['page'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['page'] ) ) : '';
+		$this->page    = isset( $_REQUEST['page'] ) ? sanitize_key( wp_unslash( $_REQUEST['page'] ) ) : '';
 
 		// Set parent defaults.
 		parent::__construct(
@@ -191,12 +191,11 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 
 	// PS to add links to the column create a function with name column_(and the name of the column)
 	protected function column_id( $item ) {
-		$page       = wp_unslash( $_REQUEST['page'] ); // WPCS: Input var ok.
 		$view_nonce = wp_create_nonce( 'view_action' );
 
 		// Build edit row action.
 		$edit_query_args_v = array(
-			'page'   => $page,
+			'page'   => $this->page,
 			'action' => 'edit',
 			'ufid'   => $item['id'],
 			'fid'    => $this->form_id,
@@ -205,7 +204,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 
 		// Build delete row action.
 		$delete_query_args = array(
-			'page'   => $page,
+			'page'   => $this->page,
 			'action' => 'view',
 			'ufid'   => $item['id'],
 			'fid'    => $this->form_id,
@@ -261,6 +260,8 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	protected function process_bulk_action() {
 		global $wpdb;
 		$form_id = $this->form_id;
+		$id      = isset( $_REQUEST['id'] ) ? (int) $_REQUEST['id'] : '';
+		$ids     = isset( $_REQUEST['id'] ) ? wp_parse_id_list( wp_unslash( $_REQUEST['id'] ) ) : array();
 
 		if ( 'delete' === $this->current_action() ) {
 			$view_nonce = isset( $_REQUEST['view_nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['view_nonce'] ) ) : '';
@@ -274,11 +275,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 				return;
 			}
 
-			if ( is_array( $_REQUEST['id'] ) ) {
-				print_r( $_REQUEST['id'] );
-			}
 			// $ids = $this->get_user_selected_records();
-			$ids = isset( $_REQUEST['id'] ) ? $_REQUEST['id'] : array();
 			if ( is_array( $ids ) ) {
 				$ids = implode( ',', $ids );
 			}
