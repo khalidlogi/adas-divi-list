@@ -159,18 +159,7 @@ class ADAS_Form_Details_Ufd {
 				);
 
 		if ( $result === false ) {
-			// An error occurred, log the error.
-			$error_message = $wpdb->last_error;
-			error_log( "Database error: $error_message" );
-		} else {
-			// Query executed successfully, and $result contains the number of affected rows.
-			if ( $result > 0 ) {
-				// Rows were updated
-				error_log( "Updated $result rows successfully." );
-			} else {
-				// No rows were updated.
-				error_log( 'No rows were updated.' );
-			}
+			return;
 		}
 
 		?>
@@ -178,6 +167,6 @@ class ADAS_Form_Details_Ufd {
 </div>
 </div>
 </div>
-<?php
+		<?php
 	}
 }

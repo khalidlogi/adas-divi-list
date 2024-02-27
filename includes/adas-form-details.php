@@ -37,30 +37,26 @@ class Adas_form_details {
 		$list_table->prepare_items();
 		?>
 <div class="wrap">
-    <h2>Contact form ID:
-        <?php echo esc_html( $this->form_id ); ?>
-    </h2>
-    <form method="post" action="">
-        <?php $list_table->display(); ?>
-    </form>
+	<h2>Contact form ID:
+		<?php echo esc_html( $this->form_id ); ?>
+	</h2>
+	<form method="post" action="">
+		<?php $list_table->display(); ?>
+	</form>
 </div>
-<?php
+		<?php
 	}
 }
 
-// WP_List_Table is not loaded automatically so we need to load it in our application
+// WP_List_Table is not loaded automatically so we need to load it in our application.
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 /**
- * WPFormsDB_Wp_List_Table class will create the page to load the table
+ * WPFormsDB_Wp_List_Table class will create the page to load the table.
  */
 class ADASDB_Wp_Sub_Page extends WP_List_Table {
 
-
-
-
-	private $per_page = 10;
 	private $form_id;
 	private $page;
 

@@ -7,15 +7,12 @@ if ( ! defined( 'WPINC' ) ) {
 
 add_action( 'admin_menu', 'tt_add_menu_items' );
 /**
- * REGISTER THE EXAMPLE ADMIN PAGE
- *
- * Now we just need to define an admin page. For this example, we'll add a top-level
- * menu item to the bottom of the admin menus.
+ * REGISTER ADMIN PAGE
  */
 function tt_add_menu_items() {
 	add_menu_page(
 		__( 'Adas Divi Contact form DB List', 'wp-list-adas' ), // Page title.
-		__( 'Adas Entries Manager', 'wp-list-adas' ),        // Menu title.
+		__( 'Adas Manager', 'wp-list-adas' ),        // Menu title.
 		'activate_plugins',                                         // Capability.
 		'adas_list',                                             // Menu slug.
 		'adas_render_list_page',                                       // Callback function.
@@ -25,18 +22,12 @@ function tt_add_menu_items() {
 
 /**
  * CALLBACK TO RENDER THE EXAMPLE ADMIN PAGE
- *
- * This function renders the admin page and the example list table. Although it's
- * possible to call `prepare_items()` and `display()` from the constructor, there
- * are often times where you may need to include logic here between those steps,
- * so we've instead called those methods explicitly. It keeps things flexible, and
- * it's the way the list tables are used in the WordPress core.
  */
 function adas_render_list_page() {
 
-	// Getting crasy with this shit
-	// this function is the switch board that will call the correct class
-	// based on the action parameter
+	// Getting crasy with this shit.
+	// this function is the switch board that will call the correct class.
+	// based on the action parameter.
 
 	// See what page we are in right now.
 	$fid  = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
@@ -148,22 +139,11 @@ class Adas_Main_List_Table extends WP_List_Table {
 	 */
 	public function prepare_items() {
 
-		/*
-		 * REQUIRED. Now we need to define our column headers. This includes a complete
-		 * array of columns to be displayed (slugs & page_ids), a list of columns
-		 * to keep hidden, and a list of columns that are sortable. Each of these
-		 * can be defined in another method (as we've done here) before being
-		 * used to build the value for our _column_headers property.
-		 */
+
 		$columns = $this->get_columns();
+		
 		$hidden  = array();
 
-		/*
-		 * REQUIRED. Finally, we build an array to be used by the class for column
-		 * headers. The $this->_column_headers property takes an array which contains
-		 * three other arrays. One for all columns, one for hidden columns, and one
-		 * for sortable columns.
-		 */
 		$this->_column_headers = array( $columns, $hidden );
 
 		/*
@@ -174,19 +154,8 @@ class Adas_Main_List_Table extends WP_List_Table {
 
 		// usort($data, array($this, 'usort_reorder'));
 
-		/*
-		 * REQUIRED for pagination. Let's figure out what page the user is currently
-		 * looking at. We'll need this later, so you should always include it in
-		 * your own package classes.
-		 */
 		$current_page = $this->get_pagenum();
 
-		/*
-		 * REQUIRED for pagination. Let's check how many items are in our data array.
-		 * In real-world use, this would be the total number of items in your database,
-		 * without filtering. We'll need this later, so you should always include it
-		 * in your own package classes.
-		 */
 		$total_items = count( $data );
 
 		/*
@@ -196,10 +165,6 @@ class Adas_Main_List_Table extends WP_List_Table {
 		 */
 		$data = array_slice( $data, ( ( $current_page - 1 ) * $this->per_page ), $this->per_page );
 
-		/*
-		 * REQUIRED. Now we can add our *sorted* data to the items property, where
-		 * it can be used by the rest of the class.
-		 */
 		$this->items = $data;
 
 		/**
