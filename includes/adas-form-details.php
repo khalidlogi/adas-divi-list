@@ -5,7 +5,6 @@
  */
 
 
-// details of the form id
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -14,7 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 class Adas_form_details {
-
 
 	/**
 	 * Form ID
@@ -27,19 +25,30 @@ class Adas_form_details {
 	 * Constructor start subpage
 	 */
 	public function __construct() {
-		$this->form_id = isset( $_REQUEST['fid'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['fid'] ) ) : '';
+		$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
 
-		$this->adas_table_page();
+		$nonce_verified = isset( $_GET['_wpnonce'] ) ? wp_verify_nonce( $nonce, 'adas_list_nonce' ) : false;
+
+		if ( ! $nonce_verified ) {
+			wp_die( 'Page : Details.phpNo action taken' );
+		}
+
+			$this->form_id = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
+
+			// create page.
+			$this->adas_table_page();
 	}
 
-	function adas_table_page() {
+	/**
+	 * Table page to display related form entries
+	 */
+	public function adas_table_page() {
 		$list_table = new ADASDB_Wp_Sub_Page();
 		$list_table->prepare_items();
 		?>
 <div class="wrap">
-	<h2>Contact form ID:
-		<?php echo esc_html( $this->form_id ); ?>
-	</h2>
+	<h2>Form ID:<span style="color:silver;"> <?php echo esc_html( $this->form_id ); ?></span></h2>
+
 	<form method="post" action="">
 		<?php $list_table->display(); ?>
 	</form>
@@ -61,10 +70,15 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	private $page;
 
 	/**
-	 * constructor.
+	 * Constructor function.
 	 */
-
 	public function __construct() {
+
+		$nonce = isset( $_REQUEST['adas_list_nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['adas_list_nonce'] ) ) : '';
+
+		if ( wp_verify_nonce( $nonce, 'adas_list_nonce' ) ) {
+			wp_die( 'No action taken' );
+		}
 
 		$this->form_id = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
 		$this->page    = isset( $_REQUEST['page'] ) ? sanitize_key( wp_unslash( $_REQUEST['page'] ) ) : '';
@@ -120,28 +134,14 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * Recommended. This method is called when the parent class can't find a method
-	 * specifically build for a given column. Generally, it's recommended to include
-	 * one method for each column you want to render, keeping your package class
-	 * neat and organized. For example, if the class needs to process a column
-	 * named 'page_id', it would first see if a method named $this->column_page_id()
-	 * exists - if it does, that method will be used. If it doesn't, this one will
-	 * be used. Generally, you should try to use custom column methods as much as
-	 * possible.
-	 *
-	 * Since we have defined a column_page_id() method later on, this method doesn't
-	 * need to concern itself with any column with a name of 'page_id'. Instead, it
-	 * needs to handle everything else.
-	 *
-	 * For more detailed insight into how columns are handled, take a look at
-	 * WP_List_Table::single_row_columns()
-	 *
 	 * @param object $item        A singular item (one full row's worth of data).
 	 * @param string $column_name The name/slug of the column to be processed.
 	 * @return string Text or HTML to be placed inside the column <td>.
 	 */
 
-	// PS Here you should add all the columns you want to diplay values for
+	/**
+	 * Get default column value.
+	 */
 	protected function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
 
@@ -184,8 +184,6 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	 * @param object $item A singular item (one full row's worth of data).
 	 * @return string Text to be placed inside the column <td>.
 	 */
-
-	// PS to add links to the column create a function with name column_(and the name of the column)
 	protected function column_id( $item ) {
 		$view_nonce = wp_create_nonce( 'view_action' );
 
@@ -201,7 +199,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 			'<a href="%1$s&view_nonce=%2$s">%3$s</a>',
 			esc_url( add_query_arg( $view_query_args, 'admin.php' ) ),
 			esc_attr( $view_nonce ),
-			_x( 'Details', 'List table row action', 'wp-list-adas' )
+			__( 'Details', 'adasdividb' )
 		);
 
 		// Return the page_id contents.
@@ -225,7 +223,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 			'delete' => __( 'Delete', 'text-domain' ),
 		);
 
-		// Add nonce to delete action
+		// Add nonce to delete action.
 		$delete_nonce       = wp_create_nonce( 'deletentry' );
 		$actions['delete'] .= sprintf(
 			'<input type="hidden" name="delete_nonce" value="%s" />',
@@ -278,7 +276,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	 * @uses $this->set_pagination_args()
 	 */
 	public function prepare_items() {
-		global $wpdb; // This is used only if making any database queries
+		global $wpdb;
 		$form_id      = $this->form_id;
 		$per_page     = 10;
 		$columns      = $this->get_columns();
@@ -315,9 +313,13 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 		);
 	}
 
+	/**
+	 * Reorde entries data based on orderby and order parameters.
+	 */
 	protected function usort_reorder( $a, $b ) {
-		$orderby = ( ! empty( $_GET['orderby'] ) ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : 'read_status';
-		$order   = ( ! empty( $_GET['order'] ) ) ? sanitize_key( wp_unslash( $_GET['order'] ) ) : 'asc';
+
+		$orderby = ( ! empty( $_GET['orderby'] ) ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : 'read_status'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$order   = ( ! empty( $_GET['order'] ) ) ? sanitize_key( wp_unslash( $_GET['order'] ) ) : 'asc'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		switch ( $orderby ) {
 			case 'read_status':
@@ -334,6 +336,13 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 		return ( $order === 'asc' ) ? $result : -$result;
 	}
 
+	/**
+	 * Get entries data to display.
+	 *
+	 * @param string $page Current page number.
+	 * @param string $items_per_page Number of items to display per page.
+	 * retrun array $results Array of entry data to display.
+	 */
 	public function entries_data( $page, $items_per_page ) {
 
 		global $wpdb;
@@ -341,9 +350,9 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 
 		global $wpdb;
 		$results = array();
-		$orderby = isset( $_GET['orderby'] ) ? 'date_submitted' : 'date_submitted';
+		$orderby = isset( $_GET['orderby'] ) ? 'date_submitted' : 'date_submitted'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		$order = isset( $_GET['order'] ) && $_GET['order'] == 'asc' ? 'ASC' : 'DESC';
+		$order = isset( $_GET['order'] ) && $_GET['order'] == 'asc' ? 'ASC' : 'DESC'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$form_id = $this->form_id;
 

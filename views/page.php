@@ -8,6 +8,10 @@
  * @license   GPL-2.0+
  */
 
+ //phpcs:ignore wordpress.noncephpcs phpcs
+
+$page = isset( $_REQUEST['page'] ) ? wp_unslash( sanitize_text_field( wp_strip_all_tags( $_REQUEST['page'] ) ) ) : '';
+
 ?>
 
 <div class="wrap">
@@ -24,7 +28,7 @@
     <!-- Forms must be manually created to enable features like bulk actions, requiring the table to be wrapped within one. -->
     <form id="entries" method="get">
         <!-- ensure that the form posts back to our current page -->
-        <input type="hidden" name="page" value="<?php echo esc_attr( $_REQUEST['page'] ); ?>" />
+        <input type="hidden" name="page" value="<?php echo esc_attr( $page ); ?>" />
         <!-- render the list table -->
         <?php $test_list_table->display(); ?>
     </form>

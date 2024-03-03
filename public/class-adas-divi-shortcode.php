@@ -6,9 +6,54 @@
  * Class to display the shortcode in the front end.
  */
 class Adas_Divi_Shortcode {
+	/**
+	 * Holds the form ID.
+	 *
+	 * @var string
+	 */
 	private $formbyid;
+
+	/**
+	 * Number of items to display per page.
+	 *
+	 * @var string
+	 */
 	private $items_per_page;
+
+	/**
+	 * Total count of forms.
+	 *
+	 * @var string
+	 */
 	private $form_count;
+
+	/**
+	 * Color for label elements.
+	 *
+	 * @var string
+	 */
+	private $khdivi_label_color;
+
+	/**
+	 * Color for text elements.
+	 *
+	 * @var string
+	 */
+	private $khdivi_text_color;
+
+	/**
+	 * Background color for export elements.
+	 *
+	 * @var string
+	 */
+	private $khdivi_exportbg_color;
+
+	/**
+	 * Background color for elements.
+	 *
+	 * @var string
+	 */
+	private $khdivi_bg_color;
 
 	public function __construct() {
 
@@ -17,18 +62,11 @@ class Adas_Divi_Shortcode {
 		// Get forms count.
 		$this->form_count = sanitize_text_field( Class_Divi_KHdb::getInstance()->count_items( $this->formbyid ) );
 
-		$options = array(
-			'khdivi_label_color'    => '#bfa1a1',
-			'khdivi_text_color'     => null,
-			'khdivi_exportbg_color' => '#408c4f',
-			'khdivi_bg_color'       => '#f8f7f7',
-			'items_per_page'        => 10,
-		);
-
-		foreach ( $options as $option => $default ) {
-			$value           = get_option( $option, $default );
-			$this->{$option} = esc_attr( $value );
-		}
+		$this->khdivi_label_color    = get_option( 'khdivi_label_color', '#bfa1a1' );
+		$this->khdivi_text_color     = get_option( 'khdivi_text_color', null );
+		$this->khdivi_exportbg_color = get_option( 'khdivi_exportbg_color', '#408c4f' );
+		$this->khdivi_bg_color       = get_option( 'khdivi_bg_color', '#f8f7f7' );
+		$this->items_per_page        = get_option( 'items_per_page', 10 );
 
 		add_action( 'init', array( &$this, 'init' ) );
 	}
@@ -86,7 +124,7 @@ class Adas_Divi_Shortcode {
 			return ob_get_clean();
 
 		} else {
-			// Get  form id
+			// Get  form id.
 			if ( ! empty( $atts['id'] ) ) {
 				$formbyid = $atts['id'];
 			} else {

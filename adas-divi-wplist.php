@@ -70,8 +70,16 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
 class Adas_Main_List_Table extends WP_List_Table {
 
 
+	/**
+	 * Set how many records should be shown per page
+	 *
+	 * @var int
+	 */
 	private $per_page = 10;
 
+	/**
+	 * Class constructor
+	 */
 	public function __construct() {
 
 		// Set parent defaults.
@@ -85,6 +93,7 @@ class Adas_Main_List_Table extends WP_List_Table {
 	}
 
 	/**
+	 *
 	 * @see WP_List_Table::::single_row_columns()
 	 * @return array An associative array containing column information.
 	 */
@@ -107,8 +116,6 @@ class Adas_Main_List_Table extends WP_List_Table {
 	 * @param string $column_name The name/slug of the column to be processed.
 	 * @return string Text or HTML to be placed inside the column <td>.
 	 */
-
-	// PS Here you should add all the columns you want to diplay values for
 	protected function column_default( $item, $column_name ) {
 		return $item[ $column_name ];
 	}
@@ -139,10 +146,9 @@ class Adas_Main_List_Table extends WP_List_Table {
 	 */
 	public function prepare_items() {
 
-
 		$columns = $this->get_columns();
-		
-		$hidden  = array();
+
+		$hidden = array();
 
 		$this->_column_headers = array( $columns, $hidden );
 
@@ -151,8 +157,6 @@ class Adas_Main_List_Table extends WP_List_Table {
 		 */
 
 		$data = $this->entries_data();
-
-		// usort($data, array($this, 'usort_reorder'));
 
 		$current_page = $this->get_pagenum();
 
@@ -203,8 +207,8 @@ class Adas_Main_List_Table extends WP_List_Table {
 		foreach ( $results as $result ) {
 			$form_id = $result['contact_form_id'];
 
-			// get the id of the form
-			$count = $wpdb->get_var(
+			// get the id of the form.
+			$count = $wpdb->get_var(// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
 					"SELECT COUNT(*) FROM {$wpdb->prefix}divi_table WHERE contact_form_id = %s",
 					$form_id
@@ -216,6 +220,7 @@ class Adas_Main_List_Table extends WP_List_Table {
 			$title = $result['contact_form_id'];
 			$link  = "<a class='row-title' href='admin.php?page=adas_list&fid=" . esc_attr( $form_id ) . '&_wpnonce=' . esc_attr( $nonce ) . "'>%s</a>";
 
+			
 			$data_value['name']  = sprintf( $link, $title );
 			$data_value['count'] = sprintf( $link, $count );
 			$data[]              = $data_value;
@@ -224,14 +229,4 @@ class Adas_Main_List_Table extends WP_List_Table {
 
 		return $data;
 	}
-
-
-	/**
-	 * Callback to allow sorting of example data.
-	 *
-	 * @param string $a First value.
-	 * @param string $b Second value.
-	 *
-	 * @return int
-	 */
 }

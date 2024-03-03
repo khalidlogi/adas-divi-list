@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- *
+ * Class ADAS_Form_Details_Ufd
  */
 class ADAS_Form_Details_Ufd {
 
@@ -23,38 +23,36 @@ class ADAS_Form_Details_Ufd {
 	 */
 	private $form_post_id;
 
-
+	/**
+	 * Constructor to initialize variables
+	 */
 	public function __construct() {
-
-		$this->init();
-
-		$this->form_details_page();
+			$this->init();
+			$this->form_details_page();
 	}
-
+	/**
+	 * Set up the page variables
+	 */
 	public function init() {
-
 		// Verify the nonce.
 		$view_nonce          = isset( $_GET['view_nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['view_nonce'] ) ) : '';
 		$view_nonce_verified = isset( $_GET['view_nonce'] ) ? wp_verify_nonce( $view_nonce, 'view_action' ) : false;
-
 		// Verify the nonce.
 		if ( isset( $_GET['fid'] ) && $view_nonce_verified ) {
-			$this->form_post_id = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
-			$this->form_id      = isset( $_GET['ufid'] ) ? (int) $_GET['ufid'] : '';
+				$this->form_post_id = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
+				$this->form_id      = isset( $_GET['ufid'] ) ? (int) $_GET['ufid'] : '';
 		} else {
 			wp_die( 'No action taken' );
 		}
 	}
-
-
-	/**
-	 * Retrieves the submitted form values for the given form ID.
-	 */
+				/**
+				 * Retrieves the submitted form values for the given form ID.
+				 */
 	public function retrieve_form_values( $formid = '' ) {
 
 		global $wpdb;
 		$formid  = $formid;
-		$results = $wpdb->get_results(
+		$results = $wpdb->get_results(// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
 				"SELECT * FROM {$wpdb->prefix}divi_table  WHERE contact_form_id = %s AND id = %d ORDER BY date_submitted DESC LIMIT 1 ",
 				$formid,
@@ -63,7 +61,7 @@ class ADAS_Form_Details_Ufd {
 		);
 
 		if ( ! $results ) {
-			error_log( 'Database error: ' );
+			return false;
 		} else {
 			foreach ( $results as $result ) {
 				$date            = sanitize_text_field( $result->date_submitted );
@@ -88,6 +86,9 @@ class ADAS_Form_Details_Ufd {
 	}
 
 
+	/**
+	 * Display the form details page.
+	 */
 	public function form_details_page() {
 		global $wpdb;
 
@@ -96,7 +97,7 @@ class ADAS_Form_Details_Ufd {
 		$form_data      = $result['data'];
 		$form_id        = $result['contact_form_id'];
 		$read_status    = $result['read_status'];
-		$read_status    = ( $read_status === '1' ) ? 'Read' : 'Not Read';
+		$read_status    = ( '1' === $read_status ) ? 'Read' : 'Not Read';
 		$date_submitted = $result['date_submitted'];
 
 		if ( empty( $results ) ) {
@@ -124,7 +125,7 @@ class ADAS_Form_Details_Ufd {
 
 		foreach ( $form_data as $key => $data ) :
 
-			if ( $key == ' ' ) {
+			if ( '' === $key || '' === $data ) {
 				continue;
 			}
 
@@ -133,16 +134,16 @@ class ADAS_Form_Details_Ufd {
 			}
 
 			if ( is_array( $data ) ) {
+				$data         = $data['value'] ?? $data;
 				$key_val      = ucfirst( $key );
 				$arr_str_data = implode( ', ', $data );
 				$arr_str_data = nl2br( $arr_str_data );
-				echo '<p><b>' . esc_html( $key_val ) . '</b>: ' . esc_html( $arr_str_data ) . '</p>';
 			} else {
-
 				$key_val = ucfirst( $key );
 				$data    = nl2br( $data );
-				echo '<p><b>' . esc_html( $key_val ) . '</b>: ' . esc_html( $data ) . '</p>';
 			}
+
+			echo '<p><b>' . esc_html( $key_val ) . '</b>: ' . esc_html( $data ) . '</p>';
 
 						endforeach;
 
@@ -158,7 +159,7 @@ class ADAS_Form_Details_Ufd {
 					)
 				);
 
-		if ( $result === false ) {
+		if ( false === $result ) {
 			return;
 		}
 
@@ -167,6 +168,6 @@ class ADAS_Form_Details_Ufd {
 </div>
 </div>
 </div>
-		<?php
+<?php
 	}
 }

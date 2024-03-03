@@ -204,7 +204,7 @@ class Adas_Divi_Settings {
 
 
 	/**
-	 * Create HTML for Enable_data_saving_checkbox field.
+	 * Create HTML for Enable_data_saving_checkbox field
 	 */
 	public function checkbox1_html() {
 		$opt   = get_option( 'Enable_data_saving_checkbox' );
@@ -217,7 +217,7 @@ class Adas_Divi_Settings {
 
 
 	/**
-	 * Create HTML for Notification checkbox field.
+	 * Create HTML for Notification checkbox field
 	 */
 	public function number_page_html() {
 
@@ -236,7 +236,7 @@ class Adas_Divi_Settings {
 		$is_table_exist = Class_Divi_KHdb::getInstance()->check_divi_table_existence();
 
 		if ( ! $is_table_exist ) {
-			// The plugin is not activated.
+			// The plugin is not activated
 			$message = __( 'Database Error! try reinstalling the Adas Plugin', 'adasdividb' );
 			printf(
 				'<div class="warning-text">%s <i class="far fa-exclamation-triangle"></i></div>',
@@ -249,7 +249,7 @@ class Adas_Divi_Settings {
 		$results_formids = $wpdb->get_results( "SELECT DISTINCT contact_form_id FROM {$wpdb->prefix}divi_table" );
 
 		if ( ! $is_divi_active ) {
-			// The plugin is not activated.
+			// The plugin is not activated
 			$message = __( 'Divi Theme is not active!', 'adasdividb' );
 			printf(
 				'<div class="warning-text">%s <i class="far fa-exclamation-triangle"></i></div>',
@@ -289,7 +289,7 @@ class Adas_Divi_Settings {
 
 
 	/**
-	 * Utility function to check if value is selected.
+	 * Utility function to check if value is selected
 	 */
 	private function cliowp_multiselected( $selected_values, $current_value ) {
 		if ( is_array( $selected_values ) && in_array( $current_value, $selected_values, true ) ) {
@@ -300,7 +300,7 @@ class Adas_Divi_Settings {
 
 
 	/**
-	 * Create HTML for color1 field.
+	 * Create HTML for color1 field
 	 */
 	public function color1_html() {
 		?>
@@ -310,7 +310,7 @@ class Adas_Divi_Settings {
 
 
 	/**
-	 * Create HTML for color1 field.
+	 * Create HTML for color1 field
 	 */
 	public function color_html2() {
 		?>
@@ -320,7 +320,7 @@ class Adas_Divi_Settings {
 
 
 	/**
-	 * Create HTML for label color field.
+	 * Create HTML for label color field
 	 */
 	public function color_html3() {
 		?>
@@ -330,7 +330,7 @@ class Adas_Divi_Settings {
 
 
 	/**
-	 * Create HTML for label color field.
+	 * Create HTML for label color field
 	 */
 	public function color_exportbg_html() {
 		?>
@@ -341,7 +341,7 @@ class Adas_Divi_Settings {
 
 
 	/**
-	 * Create Settings Page HTML.
+	 * Create Settings Page HTML
 	 */
 	public function settings_page_html() {
 		?>
