@@ -1,11 +1,11 @@
 <?php
 
 /**
- * WPFormsDB Admin subpage
+ * Adas Admin subpage
  */
 
 
-// details of the form id
+// details of the form id.
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -13,6 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 
+/**
+ * Class Adas_form_details
+ */
 class Adas_form_details {
 
 
@@ -27,11 +30,25 @@ class Adas_form_details {
 	 * Constructor start subpage
 	 */
 	public function __construct() {
-		$this->form_id = isset( $_REQUEST['fid'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['fid'] ) ) : '';
+		$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
 
-		$this->adas_table_page();
+		$nonce_verified = isset( $_GET['_wpnonce'] ) ? wp_verify_nonce( $nonce, 'adas_list_nonce' ) : false;
+
+		if ( ! $nonce_verified ) {
+			wp_die( 'No action taken' );
+		}
+
+			$this->form_id = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
+
+			// create page.
+			$this->adas_table_page();
 	}
 
+	/**
+	 * Create the page to display the form details.
+	 *
+	 * @return void
+	 */
 	function adas_table_page() {
 		$list_table = new ADASDB_Wp_Sub_Page();
 		$list_table->prepare_items();
@@ -57,14 +74,30 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
  */
 class ADASDB_Wp_Sub_Page extends WP_List_Table {
 
+	/**
+	 * Form ID
+	 *
+	 * @var string
+	 */
 	private $form_id;
+	/**
+	 * Page number.
+	 *
+	 * @var int
+	 */
 	private $page;
 
 	/**
-	 * constructor.
+	 * Constructor start subpage
 	 */
 
 	public function __construct() {
+
+		$nonce = isset( $_REQUEST['adas_list_nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['adas_list_nonce'] ) ) : '';
+
+		if ( wp_verify_nonce( $nonce, 'adas_list_nonce' ) ) {
+			wp_die( 'No action taken' );
+		}
 
 		$this->form_id = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
 		$this->page    = isset( $_REQUEST['page'] ) ? sanitize_key( wp_unslash( $_REQUEST['page'] ) ) : '';
@@ -120,19 +153,6 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	/**
 	 * Get default column value.
 	 *
-	 * Recommended. This method is called when the parent class can't find a method
-	 * specifically build for a given column. Generally, it's recommended to include
-	 * one method for each column you want to render, keeping your package class
-	 * neat and organized. For example, if the class needs to process a column
-	 * named 'page_id', it would first see if a method named $this->column_page_id()
-	 * exists - if it does, that method will be used. If it doesn't, this one will
-	 * be used. Generally, you should try to use custom column methods as much as
-	 * possible.
-	 *
-	 * Since we have defined a column_page_id() method later on, this method doesn't
-	 * need to concern itself with any column with a name of 'page_id'. Instead, it
-	 * needs to handle everything else.
-	 *
 	 * For more detailed insight into how columns are handled, take a look at
 	 * WP_List_Table::single_row_columns()
 	 *
@@ -141,15 +161,17 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	 * @return string Text or HTML to be placed inside the column <td>.
 	 */
 
-	// PS Here you should add all the columns you want to diplay values for
+	/**
+	 * Get the table columns.
+	 */
 	protected function column_default( $item, $column_name ) {
 		switch ( $column_name ) {
 
 			case 'read_status':
 				$read_status = $item['read_status'];
 
-				// Output the cell content as "Read" if read_status is 1, or "Unread" otherwise
-				return ( $read_status == 1 ) ? 'Read' : 'Unread';
+				// Output the cell content as "Read" if read_status is 1, or "Unread" otherwise.
+				return ( '1' === $read_status ) ? 'Read' : 'Unread';
 
 			case 'id':
 			case 'page_id':
@@ -184,8 +206,6 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	 * @param object $item A singular item (one full row's worth of data).
 	 * @return string Text to be placed inside the column <td>.
 	 */
-
-	// PS to add links to the column create a function with name column_(and the name of the column)
 	protected function column_id( $item ) {
 		$view_nonce = wp_create_nonce( 'view_action' );
 
@@ -269,7 +289,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	/**
 	 * Prepares the list of items for displaying.
 	 *
-	 * @global wpdb $wpdb
+	 * @global $wpdb
 	 * @uses $this->_column_headers
 	 * @uses $this->items
 	 * @uses $this->get_columns()
@@ -278,7 +298,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	 * @uses $this->set_pagination_args()
 	 */
 	public function prepare_items() {
-		global $wpdb; // This is used only if making any database queries
+		global $wpdb;
 		$form_id      = $this->form_id;
 		$per_page     = 10;
 		$columns      = $this->get_columns();
@@ -316,6 +336,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	}
 
 	protected function usort_reorder( $a, $b ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$orderby = ( ! empty( $_GET['orderby'] ) ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : 'read_status';
 		$order   = ( ! empty( $_GET['order'] ) ) ? sanitize_key( wp_unslash( $_GET['order'] ) ) : 'asc';
 
@@ -334,6 +355,11 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 		return ( $order === 'asc' ) ? $result : -$result;
 	}
 
+	/**
+	 * Get the table columns.
+	 *
+	 * @return array Array of all the list table columns.
+	 */
 	public function entries_data( $page, $items_per_page ) {
 
 		global $wpdb;
@@ -341,6 +367,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 
 		global $wpdb;
 		$results = array();
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$orderby = isset( $_GET['orderby'] ) ? 'date_submitted' : 'date_submitted';
 
 		$order = isset( $_GET['order'] ) && $_GET['order'] == 'asc' ? 'ASC' : 'DESC';

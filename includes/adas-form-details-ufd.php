@@ -5,39 +5,52 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Class ADAS_Form_Details_Ufd
  *
+ * This class handles the display of details for a submitted form.
+ * It retrieves the form data from the database and renders an HTML page
+ * to show the submitted form values, submission date, and other relevant information.
  */
 class ADAS_Form_Details_Ufd {
 
+
 	/**
-	 * The ID of the form this record is for
+	 * The ID of the form this record is for.
 	 *
 	 * @var int
 	 */
 	private $form_id;
 
 	/**
-	 * The ID of the form this record is associated with
+	 * The ID of the form post this record is associated with.
 	 *
 	 * @var string
 	 */
 	private $form_post_id;
 
-
+	/**
+	 * ADAS_Form_Details_Ufd constructor.
+	 *
+	 * Initializes the class and calls the form_details_page() method.
+	 */
 	public function __construct() {
-
 		$this->init();
-
 		$this->form_details_page();
 	}
 
+	/**
+	 * Initialize the class and set its properties.
+	 *
+	 * Verifies the nonce (security token) and retrieves the form ID and submission ID
+	 * from the URL parameters. If the nonce is invalid or the required parameters
+	 * are missing, the script exits with an error message.
+	 */
 	public function init() {
-
 		// Verify the nonce.
 		$view_nonce          = isset( $_GET['view_nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['view_nonce'] ) ) : '';
 		$view_nonce_verified = isset( $_GET['view_nonce'] ) ? wp_verify_nonce( $view_nonce, 'view_action' ) : false;
 
-		// Verify the nonce.
+		// Verify the nonce and retrieve the form ID and submission ID.
 		if ( isset( $_GET['fid'] ) && $view_nonce_verified ) {
 			$this->form_post_id = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
 			$this->form_id      = isset( $_GET['ufid'] ) ? (int) $_GET['ufid'] : '';
@@ -46,48 +59,57 @@ class ADAS_Form_Details_Ufd {
 		}
 	}
 
-
 	/**
 	 * Retrieves the submitted form values for the given form ID.
+	 *
+	 * @param string $formid The ID of the form to retrieve the values for.
+	 * @return array|null An array containing the form values and other relevant information, or null if no results are found.
 	 */
 	public function retrieve_form_values( $formid = '' ) {
-
 		global $wpdb;
 		$formid  = $formid;
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->prefix}divi_table  WHERE contact_form_id = %s AND id = %d ORDER BY date_submitted DESC LIMIT 1 ",
+				"SELECT * FROM {$wpdb->prefix}divi_table WHERE contact_form_id = %s AND id = %d ORDER BY date_submitted DESC LIMIT 1",
 				$formid,
 				$this->form_id
-			),
+			)
 		);
 
 		if ( ! $results ) {
 			error_log( 'Database error: ' );
-		} else {
-			foreach ( $results as $result ) {
-				$date            = sanitize_text_field( $result->date_submitted );
-				$serialized_data = ( $result->form_values );
-				$form_id         = sanitize_text_field( $result->contact_form_id );
-				$id              = absint( $result->id );
-
-				// Unserialize the serialized form value.
-				$unserialized_data = unserialize( $serialized_data );
-
-				$form_values = array(
-					'contact_form_id' => $form_id,
-					'id'              => $id,
-					'read_status'     => $result->read_status,
-					'date_submitted'  => $result->date_submitted,
-					'date'            => $date,
-					'data'            => $unserialized_data,
-				);
-			}
-			return $form_values;
+			return null;
 		}
+
+		foreach ( $results as $result ) {
+			$date            = sanitize_text_field( $result->date_submitted );
+			$serialized_data = ( $result->form_values );
+			$form_id         = sanitize_text_field( $result->contact_form_id );
+			$id              = absint( $result->id );
+
+			// Unserialize the serialized form value.
+			$unserialized_data = unserialize( $serialized_data );
+
+			$form_values = array(
+				'contact_form_id' => $form_id,
+				'id'              => $id,
+				'read_status'     => $result->read_status,
+				'date_submitted'  => $result->date_submitted,
+				'date'            => $date,
+				'data'            => $unserialized_data,
+			);
+		}
+
+		return $form_values;
 	}
 
-
+	/**
+	 * Renders the form details page.
+	 *
+	 * Retrieves the form data from the database, formats it, and outputs an HTML structure
+	 * to display the form details, including the form ID, submission date, read status,
+	 * and the submitted form values.
+	 */
 	public function form_details_page() {
 		global $wpdb;
 
@@ -96,34 +118,34 @@ class ADAS_Form_Details_Ufd {
 		$form_data      = $result['data'];
 		$form_id        = $result['contact_form_id'];
 		$read_status    = $result['read_status'];
-		$read_status    = ( $read_status === '1' ) ? 'Read' : 'Not Read';
+		$read_status    = ( '1' === $read_status ) ? 'Read' : 'Not Read';
 		$date_submitted = $result['date_submitted'];
 
 		if ( empty( $results ) ) {
 			wp_die( 'Not valid contact form' );
 		}
 
+		// Output the HTML structure to display the form details.
 		echo '<style>
             .adas-form-details-wrap {' .
-				'font-size: 16px;' .
+			'font-size: 16px;' .
 			'}' .
 			'.form-information span {' .
-				'margin-left: 1em;' .
+			'margin-left: 1em;' .
 			'}</style>' .
-		'<div class="adas-form-details-wrapper">' .
+			'<div class="adas-form-details-wrapper">' .
 			'<div id="welcome-panel" class="cfdb7-panel">' .
-				'<div class="cfdb7-panel-content">' .
-					'<div class="welcome-panel-column-container">' .
-						'<h3> Form ID: <span id="form-id">' . esc_html( $form_id ) . '</span></h3>' .
-						'<p><b>Submission Date:</b> ' . esc_html( $date_submitted ) . '</p>' .
-						'<p><b>Read Status:</b> ' . esc_html( $read_status ) . '</p>';
+			'<div class="cfdb7-panel-content">' .
+			'<div class="welcome-panel-column-container">' .
+			'<h3> Form ID: <span id="form-id">' . esc_html( $form_id ) . '</span></h3>' .
+			'<p><b>Submission Date:</b> ' . esc_html( $date_submitted ) . '</p>' .
+			'<p><b>Read Status:</b> ' . esc_html( $read_status ) . '</p>';
 
 		if ( ( $results ) ) {
-					$form_data = ( $results );
+			$form_data = ( $results );
 		}
 
 		foreach ( $form_data as $key => $data ) :
-
 			if ( $key == ' ' ) {
 				continue;
 			}
@@ -138,35 +160,34 @@ class ADAS_Form_Details_Ufd {
 				$arr_str_data = nl2br( $arr_str_data );
 				echo '<p><b>' . esc_html( $key_val ) . '</b>: ' . esc_html( $arr_str_data ) . '</p>';
 			} else {
-
 				$key_val = ucfirst( $key );
-				$data    = nl2br( $data );
+				// Check if the data is an email.
+				if ( filter_var( $data, FILTER_VALIDATE_EMAIL ) ) {
+					$data = '<a href="mailto:' . esc_attr( $data ) . '">' . esc_html( $data ) . '</a>';
+				} else {
+					$data = nl2br( $data );
+				}
 				echo '<p><b>' . esc_html( $key_val ) . '</b>: ' . esc_html( $data ) . '</p>';
 			}
+		endforeach;
 
-						endforeach;
+		$form_data = serialize( $form_data );
+		$form_id   = $result['contact_form_id'];
 
-						$form_data = serialize( $form_data );
-						$form_id   = $result['contact_form_id'];
+		// Update the read_status and read_date for the current submission.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->query(
+			$wpdb->prepare(
+				"UPDATE {$wpdb->prefix}divi_table SET read_status = %s, read_date = NOW() WHERE id = %d",
+				'1',
+				$this->form_id
+			)
+		);
 
-				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$result = $wpdb->query(
-					$wpdb->prepare(
-						"UPDATE {$wpdb->prefix}divi_table SET read_status = %s, read_date = NOW() WHERE id = %d",
-						'1',
-						$this->form_id
-					)
-				);
-
-		if ( $result === false ) {
+		if ( false === $result ) {
 			return;
 		}
 
-		?>
-</div>
-</div>
-</div>
-</div>
-		<?php
+		echo '</div></div></div></div>';
 	}
 }
