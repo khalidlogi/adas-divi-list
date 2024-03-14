@@ -146,27 +146,39 @@ class ADAS_Form_Details_Ufd {
 		}
 
 		foreach ( $form_data as $key => $data ) :
-			if ( $key == ' ' ) {
+
+			// Check if the key or value is empty
+			if ( '' === $key || '' === $data ) {
 				continue;
 			}
 
+			// If the value is an array, extract the 'value' key or the array itself.
 			if ( is_array( $data ) ) {
 				$data = $data['value'] ?? $data;
 			}
 
+			// If the value is an array again, implode it into a comma-separated string with newlines between each value, and then convert it to a formatted string.
 			if ( is_array( $data ) ) {
+				$data         = $data['value'] ?? $data;
 				$key_val      = ucfirst( $key );
 				$arr_str_data = implode( ', ', $data );
 				$arr_str_data = nl2br( $arr_str_data );
-				echo '<p><b>' . esc_html( $key_val ) . '</b>: ' . esc_html( $arr_str_data ) . '</p>';
 			} else {
+				// Otherwise, just convert the value to a formatted string.
 				$key_val = ucfirst( $key );
-				// Check if the data is an email.
-				if ( filter_var( $data, FILTER_VALIDATE_EMAIL ) ) {
-					$data = '<a href="mailto:' . esc_attr( $data ) . '">' . esc_html( $data ) . '</a>';
-				} else {
-					$data = nl2br( $data );
-				}
+				$data    = nl2br( $data );
+			}
+
+			// Check if the value is a valid email address.
+			if ( filter_var( $data, FILTER_VALIDATE_EMAIL ) ) {
+				// If it is, display it as a link to the email address
+				echo '<p><b>' . esc_html( $key_val ) . '</b>:';
+				echo '<a href="mailto:' . esc_attr( $data ) . '" rel="noopener">';
+				echo esc_html( $data );
+				echo '</a>';
+				echo '</p>';
+			} else {
+				// If it is not, display the value as a regular string.
 				echo '<p><b>' . esc_html( $key_val ) . '</b>: ' . esc_html( $data ) . '</p>';
 			}
 		endforeach;

@@ -30,6 +30,7 @@ function adas_render_list_page() {
 	// based on the action parameter.
 
 	// See what page we are in right now.
+	// phpcs:disable WordPress.Security.NonceVerification.Recommended
 	$fid  = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
 	$ufid = isset( $_GET['ufid'] ) ? (int) $_GET['ufid'] : '';
 
@@ -63,13 +64,16 @@ function adas_render_list_page() {
  * @author  Matt van Andel
  */
 
-// WP_List_Table is not loaded automatically so we need to load it in our application
+// WP_List_Table is not loaded automatically so we need to load it in our application.
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 class Adas_Main_List_Table extends WP_List_Table {
 
 
+	/**
+	 * How many items to show on a single page.
+	 */
 	private $per_page = 10;
 
 	public function __construct() {
@@ -85,6 +89,8 @@ class Adas_Main_List_Table extends WP_List_Table {
 	}
 
 	/**
+	 * get_columns function
+	 *
 	 * @see WP_List_Table::::single_row_columns()
 	 * @return array An associative array containing column information.
 	 */
@@ -108,7 +114,7 @@ class Adas_Main_List_Table extends WP_List_Table {
 	 * @return string Text or HTML to be placed inside the column <td>.
 	 */
 
-	// PS Here you should add all the columns you want to diplay values for
+	// Here you should add all the columns you want to diplay values for.
 	protected function column_default( $item, $column_name ) {
 		return $item[ $column_name ];
 	}
@@ -139,10 +145,9 @@ class Adas_Main_List_Table extends WP_List_Table {
 	 */
 	public function prepare_items() {
 
-
 		$columns = $this->get_columns();
-		
-		$hidden  = array();
+
+		$hidden = array();
 
 		$this->_column_headers = array( $columns, $hidden );
 
@@ -203,7 +208,8 @@ class Adas_Main_List_Table extends WP_List_Table {
 		foreach ( $results as $result ) {
 			$form_id = $result['contact_form_id'];
 
-			// get the id of the form
+			// get the id of the form.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$count = $wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT COUNT(*) FROM {$wpdb->prefix}divi_table WHERE contact_form_id = %s",
@@ -224,14 +230,4 @@ class Adas_Main_List_Table extends WP_List_Table {
 
 		return $data;
 	}
-
-
-	/**
-	 * Callback to allow sorting of example data.
-	 *
-	 * @param string $a First value.
-	 * @param string $b Second value.
-	 *
-	 * @return int
-	 */
 }
