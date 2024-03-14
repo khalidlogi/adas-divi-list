@@ -54,14 +54,14 @@ class Adas_form_details {
 		$list_table->prepare_items();
 		?>
 <div class="wrap">
-	<h2>Contact form ID:
-		<?php echo esc_html( $this->form_id ); ?>
-	</h2>
-	<form method="post" action="">
-		<?php $list_table->display(); ?>
-	</form>
+    <h2>Contact form ID:
+        <?php echo esc_html( $this->form_id ); ?>
+    </h2>
+    <form method="post" action="">
+        <?php $list_table->display(); ?>
+    </form>
 </div>
-		<?php
+<?php
 	}
 }
 
@@ -136,7 +136,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 
 
 	/**
-	 * Get a list of sortable columns. The format is:
+	 * Get a list of sortable columns.
 	 *
 	 * @return array An associative array containing all the columns that should be sortable.
 	 */
@@ -245,7 +245,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 			'delete' => __( 'Delete', 'text-domain' ),
 		);
 
-		// Add nonce to delete action
+		// Add nonce to delete action.
 		$delete_nonce       = wp_create_nonce( 'deletentry' );
 		$actions['delete'] .= sprintf(
 			'<input type="hidden" name="delete_nonce" value="%s" />',
@@ -347,6 +347,9 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 			case 'id':
 				$result = $a['id'] - $b['id'];
 				break;
+			case 'date_submitted':
+				$result = strcmp( $a['date_submitted'], $b['date_submitted'] );
+				break;
 			// Add other column cases here if needed.
 			default:
 				return 0; // Return 0 for no sorting.
@@ -370,7 +373,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$orderby = isset( $_GET['orderby'] ) ? 'date_submitted' : 'date_submitted';
 
-		$order = isset( $_GET['order'] ) && $_GET['order'] == 'asc' ? 'ASC' : 'DESC';
+		$order = isset( $_GET['order'] ) && $_GET['order'] === 'asc' ? 'ASC' : 'DESC';
 
 		$form_id = $this->form_id;
 
