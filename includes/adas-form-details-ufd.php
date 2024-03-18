@@ -5,13 +5,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class ADAS_Form_Details_Ufd
+ * Class Adas_Form_Details_Ufd
  *
  * This class handles the display of details for a submitted form.
  * It retrieves the form data from the database and renders an HTML page
  * to show the submitted form values, submission date, and other relevant information.
  */
-class ADAS_Form_Details_Ufd {
+class Adas_Form_Details_Ufd {
 
 
 	/**
@@ -29,7 +29,7 @@ class ADAS_Form_Details_Ufd {
 	private $form_post_id;
 
 	/**
-	 * ADAS_Form_Details_Ufd constructor.
+	 * Adas_Form_Details_Ufd constructor.
 	 *
 	 * Initializes the class and calls the form_details_page() method.
 	 */

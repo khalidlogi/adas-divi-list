@@ -11,8 +11,8 @@ add_action( 'admin_menu', 'tt_add_menu_items' );
  */
 function tt_add_menu_items() {
 	add_menu_page(
-		__( 'Adas Divi Contact form DB List', 'wp-list-adas' ), // Page title.
-		__( 'Adas Manager', 'wp-list-adas' ),        // Menu title.
+		__( 'Adas Divi Contact form DB List', 'adasdividb' ), // Page title.
+		__( 'Adas Manager', 'adasdividb' ),        // Menu title.
 		'activate_plugins',                                         // Capability.
 		'adas_list',                                             // Menu slug.
 		'adas_render_list_page',                                       // Callback function.
@@ -35,13 +35,13 @@ function adas_render_list_page() {
 	$ufid = isset( $_GET['ufid'] ) ? (int) $_GET['ufid'] : '';
 
 	if ( ! empty( $fid ) && empty( $ufid ) ) {
-		new Adas_form_details();
+		new Adas_Form_Details();
 		return;
 	}
 
 	if ( ! empty( $ufid ) && ! empty( $fid ) ) {
 
-		new ADAS_Form_Details_Ufd();
+		new Adas_Form_Details_Ufd();
 		return;
 	}
 
@@ -97,8 +97,8 @@ class Adas_Main_List_Table extends WP_List_Table {
 	public function get_columns() {
 
 		$columns = array(
-			'name'  => __( 'Contact Form ID', 'contact-form-WPFormsDB' ),
-			'count' => __( 'Count', 'contact-form-WPFormsDB' ),
+			'name'  => __( 'Contact Form ID', 'adasdividb' ),
+			'count' => __( 'Count', 'adasdividb' ),
 		);
 
 		return $columns;

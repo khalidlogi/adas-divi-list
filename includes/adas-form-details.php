@@ -14,9 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 /**
- * Class Adas_form_details
+ * Class Adas_Form_Details
  */
-class Adas_form_details {
+class Adas_Form_Details {
 
 
 	/**

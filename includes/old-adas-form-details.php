@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 
-class Adas_form_details {
+class Adas_Form_Details {
 
 
 	private $form_id;
@@ -107,7 +107,6 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	 * REQUIRED. Set up a constructor that references the parent constructor. We
 	 * use the parent reference to set some default configs.
 	 */
-
 	public function __construct() {
 
 		if ( isset( $_REQUEST['fid'] ) ) {
