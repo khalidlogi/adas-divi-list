@@ -28,6 +28,7 @@ class Adas_Form_Details_Ufd {
 	 */
 	private $form_post_id;
 
+	private $adasclientemail;
 	/**
 	 * Adas_Form_Details_Ufd constructor.
 	 *
@@ -157,9 +158,12 @@ class Adas_Form_Details_Ufd {
 				$data = $data['value'] ?? $data;
 			}
 
+			if ( filter_var( $data, FILTER_VALIDATE_EMAIL ) ) {
+				$this->adasclientemail = $data;
+			}
+
 			// If the value is an array again, implode it into a comma-separated string with newlines between each value, and then convert it to a formatted string.
 			if ( is_array( $data ) ) {
-				$data         = $data['value'] ?? $data;
 				$key_val      = ucfirst( $key );
 				$arr_str_data = implode( ', ', $data );
 				$arr_str_data = nl2br( $arr_str_data );
@@ -169,21 +173,17 @@ class Adas_Form_Details_Ufd {
 				$data    = nl2br( $data );
 			}
 
-			// Check if the value is a valid email address.
-			if ( filter_var( $data, FILTER_VALIDATE_EMAIL ) ) {
-				// If it is, display it as a link to the email address
-				echo '<p><b>' . esc_html( $key_val ) . '</b>:';
-
-				echo '<a href="mailto:' . esc_attr( $data ) . '" rel="noopener">';
-                
-				echo esc_html( $data );
-				echo '</a>';
-				echo '</p>';
-			} else {
 				// If it is not, display the value as a regular string.
 				echo '<p><b>' . esc_html( $key_val ) . '</b>: ' . esc_html( $data ) . '</p>';
-			}
+
 		endforeach;
+
+		// Add a button to send an email to the client.
+		if ( isset( $this->adasclientemail ) ) {
+			echo '<a href="mailto:' . esc_attr( $this->adasclientemail ) . '">
+                    <button style="margin-top: 1em;color: white; border: none; padding: 0.5em 1.5em; cursor:pointer; white; background-color: #6a6ae8;" type="button">Reply to email</button>
+                  </a>';
+		}
 
 		$form_data = serialize( $form_data );
 		$form_id   = $result['contact_form_id'];
