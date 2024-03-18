@@ -8,25 +8,27 @@
  * @license   GPL-2.0+
  */
 
+// phpcs:disable WordPress.Security.NonceVerification.Recommended 
+$pag = isset( $_REQUEST['page'] ) ? sanitize_title_with_dashes( wp_unslash( $_REQUEST['page'] ) ) : null;
 ?>
 
 <div class="wrap">
-    <h1>
-        <?php echo esc_html( get_admin_page_title() ); ?>
-    </h1>
+	<h1>
+		<?php echo esc_html( get_admin_page_title() ); ?>
+	</h1>
 
-    <div style="background:#ececec;border:1px solid #ccc;padding:0 10px;margin-top:5px;border-radius:5px;">
-        <p>
-            Contact forms entries created using the Divi builder are stored in custom WP database table.
-        </p>
-    </div>
+	<div style="background:#ececec;border:1px solid #ccc;padding:0 10px;margin-top:5px;border-radius:5px;">
+		<p>
+			Contact forms entries created using the Divi builder are stored in custom WP database table.
+		</p>
+	</div>
 
-    <!-- Forms must be manually created to enable features like bulk actions, requiring the table to be wrapped within one. -->
-    <form id="entries" method="get">
-        <!-- ensure that the form posts back to our current page -->
-        <input type="hidden" name="page" value="<?php echo esc_attr( $_REQUEST['page'] ); ?>" />
-        <!-- render the list table -->
-        <?php $test_list_table->display(); ?>
-    </form>
+	<!-- Forms must be manually created to enable features like bulk actions, requiring the table to be wrapped within one. -->
+	<form id="entries" method="get">
+		<!-- ensure that the form posts back to our current page -->
+		<input type="hidden" name="page" value="<?php echo esc_attr( $pag ); ?>" />
+		<!-- render the list table -->
+		<?php $test_list_table->display(); ?>
+	</form>
 
 </div>

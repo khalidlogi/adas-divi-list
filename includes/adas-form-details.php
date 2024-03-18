@@ -90,7 +90,6 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	/**
 	 * Constructor start subpage
 	 */
-
 	public function __construct() {
 
 		$nonce = isset( $_REQUEST['adas_list_nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['adas_list_nonce'] ) ) : '';
@@ -100,7 +99,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 		}
 
 		$this->form_id = isset( $_GET['fid'] ) ? sanitize_text_field( wp_unslash( $_GET['fid'] ) ) : '';
-		$this->page    = isset( $_REQUEST['page'] ) ? sanitize_key( wp_unslash( $_REQUEST['page'] ) ) : '';
+		$this->page    = isset( $_REQUEST['page'] ) ? sanitize_title_with_dashes( wp_unslash( $_REQUEST['page'] ) ) : '';
 
 		// Set parent defaults.
 		parent::__construct(
@@ -337,8 +336,8 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 
 	protected function usort_reorder( $a, $b ) {
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
-		$orderby = ( ! empty( $_GET['orderby'] ) ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : 'read_status';
-		$order   = ( ! empty( $_GET['order'] ) ) ? sanitize_key( wp_unslash( $_GET['order'] ) ) : 'asc';
+		$orderby = ( ! empty( $_GET['orderby'] ) ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) )( wp_unslash( $_GET['orderby'] ) ) : 'read_status';
+		$order   = ( ! empty( $_GET['order'] ) ) ? sanitize_text_field( wp_unslash( $_GET['order'] ) ) : 'asc';
 
 		switch ( $orderby ) {
 			case 'read_status':
