@@ -76,6 +76,9 @@ class Adas_Main_List_Table extends WP_List_Table {
 	 */
 	private $per_page = 10;
 
+	/**
+	 * Class constructor.
+	 */
 	public function __construct() {
 
 		// Set parent defaults.
@@ -89,7 +92,7 @@ class Adas_Main_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * get_columns function
+	 * This is a custom get_columns function
 	 *
 	 * @see WP_List_Table::::single_row_columns()
 	 * @return array An associative array containing column information.

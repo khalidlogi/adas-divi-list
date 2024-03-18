@@ -147,12 +147,12 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 	public function get_columns() {
 		$columns = array(
 			'cb'             => '<input type="checkbox" />', // Render a checkbox instead of text.
-			'id'             => _x( 'id', 'Column label', 'wp-list-adas' ),
-			'page_id'        => _x( 'page_id', 'Column label', 'wp-list-adas' ),
-			'page_name'      => _x( 'page_name', 'Column label', 'wp-list-adas' ),
-			'page_url'       => _x( 'page_url', 'Column label', 'wp-list-adas' ),
-			'date_submitted' => _x( 'date_submitted', 'Column label', 'wp-list-adas' ),
-			'read_status'    => _x( 'Read Status', 'Column label', 'wp-list-adas' ),
+			'id'             => _x( 'id', 'Column label', 'adasdividb' ),
+			'page_id'        => _x( 'page_id', 'Column label', 'adasdividb' ),
+			'page_name'      => _x( 'page_name', 'Column label', 'adasdividb' ),
+			'page_url'       => _x( 'page_url', 'Column label', 'adasdividb' ),
+			'date_submitted' => _x( 'date_submitted', 'Column label', 'adasdividb' ),
+			'read_status'    => _x( 'Read Status', 'Column label', 'adasdividb' ),
 		);
 
 		return $columns;
@@ -290,7 +290,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 		$actions['view'] = sprintf(
 			'<a href="%1$s">%2$s</a>',
 			esc_url(wp_nonce_url(add_query_arg($edit_query_args_v, 'admin.php'), 'editentry_' . $item['id'])),
-			_x('Details', 'List table row action', 'wp-list-adas')
+			_x('Details', 'List table row action', 'adasdividb')
 		);*/
 
 		// Build delete row action.
@@ -305,7 +305,7 @@ class ADASDB_Wp_Sub_Page extends WP_List_Table {
 			'<a href="%1$s&delete_nonce=%2$s">%3$s</a>',
 			esc_url( add_query_arg( $delete_query_args, 'admin.php' ) ),
 			esc_attr( $delete_nonce ),
-			_x( 'Details', 'List table row action', 'wp-list-adas' )
+			_x( 'Details', 'List table row action', 'adasdividb' )
 		);
 
 		// Return the page_id contents.

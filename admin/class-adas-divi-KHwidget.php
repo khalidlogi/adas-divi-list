@@ -55,7 +55,7 @@ class Adas_Divi_KHwidget {
 	public function adas_dashboard_widget_display() {
 
 		global $wpdb;
-		// Output the nonce field
+		// Output the nonce field.
 		$nonce = wp_create_nonce( 'update_data_saving_option' );
 
 		$table_name = $wpdb->prefix . 'divi_table';
@@ -169,7 +169,7 @@ jQuery(document).ready(function($) {
 			}
 
 			// Get the date of last submissions
-			$last_submissions_label = __( 'Last three submissions', 'adasdividb' );
+			$last_submissions_label = __( 'Recent Submission Dates', 'adasdividb' );
 			printf( '<br><h3><strong>%s</strong></h3>', esc_html( $last_submissions_label ) );
 			$last_three_dates = Class_Divi_KHdb::getInstance()->get_last_three_dates();
 			foreach ( $last_three_dates as $date ) {
