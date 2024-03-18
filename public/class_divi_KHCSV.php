@@ -3,9 +3,21 @@
 
 if ( ! class_exists( 'class_divi_KHCSV' ) ) {
 
+	/**
+	 * Class class_divi_KHCSV Export Form Data as CSV
+	 */
 	class class_divi_KHCSV {
 
+		/**
+		 * Retrieve Form ID
+		 *
+		 * @var string
+		 */
 		private $myselectedformid;
+
+		/**
+		 * Constructor
+		 */
 		public function __construct() {
 
 			$this->myselectedformid = sanitize_text_field( Class_Divi_KHdb::getInstance()->retrieve_form_id() );
@@ -23,13 +35,13 @@ if ( ! class_exists( 'class_divi_KHCSV' ) ) {
 			// Strip tags.
 			$value = wp_strip_all_tags( $value );
 
-			// Escape special characters
+			// Escape special characters.
 			$value = esc_sql( $value );
 
-			$maxLength = 355;
+			$max_length = 600;
 
-			if ( strlen( $value ) > $maxLength ) {
-				$value     = substr( $value, 0, $maxLength );
+			if ( strlen( $value ) > $max_length ) {
+				$value     = substr( $value, 0, $max_length );
 					$value = $value . '...';
 			}
 
@@ -42,9 +54,10 @@ if ( ! class_exists( 'class_divi_KHCSV' ) ) {
 		public function export_form_data() {
 
 			global $wpdb;
+			$csv_table              = '';
 			$this->myselectedformid = class_divi_KHdb::getInstance()->retrieve_form_id();
 
-			// Retrieve the form values from the database
+			// Retrieve the form values from the database.
 			$form_values = Class_Divi_KHdb::getInstance()->retrieve_form_values_pdf( $this->myselectedformid );
 
 			if ( empty( $form_values ) ) {

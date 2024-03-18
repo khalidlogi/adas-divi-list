@@ -173,7 +173,9 @@ class Adas_Form_Details_Ufd {
 			if ( filter_var( $data, FILTER_VALIDATE_EMAIL ) ) {
 				// If it is, display it as a link to the email address
 				echo '<p><b>' . esc_html( $key_val ) . '</b>:';
+
 				echo '<a href="mailto:' . esc_attr( $data ) . '" rel="noopener">';
+                
 				echo esc_html( $data );
 				echo '</a>';
 				echo '</p>';
