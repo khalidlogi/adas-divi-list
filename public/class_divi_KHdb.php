@@ -1,4 +1,5 @@
 <?php
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -273,6 +274,11 @@ class Class_Divi_KHdb {
 
 	/**
 	 * Function to retrieve all data from the custom table.
+	 *
+	 * @param string|null $formid (Optional) The ID of the form.
+	 * @param string|null $offset (Optional) The offset.
+	 * @param string|null $items_per (Optional) The number of items per page.
+	 * @param string|null $LIMIT (Optional) The limit.
 	 */
 	public function retrieve_form_values( $formid = '', $offset = '', $items_per = '', $LIMIT = '' ) {
 

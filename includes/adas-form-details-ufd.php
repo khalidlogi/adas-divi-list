@@ -68,7 +68,7 @@ class Adas_Form_Details_Ufd {
 	 */
 	public function retrieve_form_values( $formid = '' ) {
 		global $wpdb;
-		$formid  = $formid;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT * FROM {$wpdb->prefix}divi_table WHERE contact_form_id = %s AND id = %d ORDER BY date_submitted DESC LIMIT 1",
@@ -148,7 +148,7 @@ class Adas_Form_Details_Ufd {
 
 		foreach ( $form_data as $key => $data ) :
 
-			// Check if the key or value is empty
+			// Check if the key or value is empty.
 			if ( '' === $key || '' === $data ) {
 				continue;
 			}
