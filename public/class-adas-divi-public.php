@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * The public-facing functionality of the plugin.
@@ -23,7 +22,6 @@
  */
 class Adas_Divi_Public {
 
-
 	private $table_name;
 	private $plugin_name;
 	private $version;
@@ -33,7 +31,6 @@ class Adas_Divi_Public {
 	 * Initialize the class and set its properties.
 	 */
 	public function __construct( $plugin_name, $version ) {
-
 		global $wpdb;
 		$this->table_name  = $wpdb->prefix . 'divi_table';
 		$this->plugin_name = $plugin_name;
@@ -44,132 +41,153 @@ class Adas_Divi_Public {
 	/**
 	 * Retrieve and return form values
 	 */
-	function get_form_values() {
+	public function get_form_values() {
 
 		global $wpdb;
-		$id = intval( $_POST['id'] );
 
-		$query           = $wpdb->prepare( "SELECT id, form_values FROM $this->table_name WHERE id = %d", $id );
-		$serialized_data = $wpdb->get_results( $query );
+		if ( isset( $_POST['id'] ) && isset( $_POST['edit_value_nonce'] ) && isset( $_POST['form_id'] ) ) {
 
-		if ( $wpdb->last_error ) {
-			// wp_send_json_error('Error: ' . $wpdb->last_error);
-		}
+			$id    = isset( $_POST['id'] ) ? intval( $_POST['id'] ) : null;
+			$nonce = isset( $_POST['edit_value_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['edit_value_nonce'] ) ) : null;
 
-		if ( $serialized_data ) {
-			// Unserialize the serialized form value
-			$unserialized_data = unserialize( $serialized_data[0]->form_values );
-			$fields            = array();
+			if ( wp_verify_nonce( $nonce, 'edit_value_nonce' ) ) {
 
-			foreach ( $unserialized_data as $key => $value ) {
-				if ( is_array( $value ) ) {
-					if ( array_key_exists( 'value', $value ) ) {
-						$newvalue = stripslashes( $value['value'] );
-					} else {
-						$newvalue = stripslashes( $value );
-					}
-				} else {
-					$newvalue = $value;
-				}
-				$fields[] = array(
-					'name'  => $key,
-					'value' => $newvalue,
+				// Fetch form_value from DB based on the form_id.
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$serialized_data = $wpdb->get_results(
+					$wpdb->prepare(
+						"SELECT id, form_values FROM {$wpdb->prefix}divi_table WHERE id = %d",
+						$id
+					)
 				);
+
+				if ( $wpdb->last_error ) {
+					return wp_send_json_error( $wpdb->last_error );
+				}
+
+				if ( $serialized_data ) {
+					// Unserialize the serialized form value.
+					$unserialized_data = unserialize( $serialized_data[0]->form_values );
+					$fields            = array();
+
+					foreach ( $unserialized_data as $key => $value ) {
+						if ( is_array( $value ) ) {
+							if ( array_key_exists( 'value', $value ) ) {
+								$newvalue = stripslashes( $value['value'] );
+							} else {
+								$newvalue = implode( ', ', array_map( 'stripslashes', $value ) );
+							}
+						} else {
+							$newvalue = $value;
+						}
+						$fields[] = array(
+							'name'  => $key,
+							'value' => $newvalue,
+						);
+					}
+					wp_send_json_success( array( 'fields' => $fields ) );
+				}
 			}
-			wp_send_json_success( array( 'fields' => $fields ) );
 		}
 	}
-
 
 	/**
 	 * Delete row by ID
 	 */
-	function delete_form_row() {
+	public function delete_form_row() {
 		global $wpdb;
-		$id = intval( $_POST['id'] );
 
-		if ( ! $id ) {
+		if ( isset( $_REQUEST['id'] ) ) {
+			$id    = isset( $_POST['id'] ) ? intval( $_POST['id'] ) : null;
+			$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+
+			// Check permissions.
+			if ( ! current_user_can( 'manage_options' ) ) {
+				exit;
+			}
+
+			if ( isset( $_POST['nonce'] ) && ! empty( $_POST['nonce'] ) ) {
+				if ( ! wp_verify_nonce( $nonce, 'ajax-nonce' ) ) {
+					die();
+				}
+			} else {
+				die();
+			}
+
+			try {
+				// Prepared statement for security.
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$wpdb->query(
+					$wpdb->prepare(
+						"DELETE FROM {$wpdb->prefix}divi_table WHERE id = %d",
+						$id
+					)
+				);
+			} catch ( Exception $e ) {
+				wp_send_json_error( "Error deleting entry: {$e->getMessage()}" );
+			}
+
 			exit;
 		}
-		// Check permissions
-		if ( ! current_user_can( 'manage_options' ) ) {
-			exit;
-		}
-
-		// Check for nonce security
-		if ( ! wp_verify_nonce( $_POST['nonce'], 'ajax-nonce' ) ) {
-			die();
-		}
-		try {
-			// Prepared statement for security
-			$wpdb->query(
-				$wpdb->prepare(
-					"DELETE FROM {$this->table_name} WHERE id = %d",
-					$id
-				)
-			);
-
-		} catch ( Exception $e ) {
-			error_log( "Error deleting entry: {$e->getMessage()}" );
-		}
-
-		exit;
 	}
-
 
 	/**
 	 *  Update form values
 	 */
-	function update_form_values() {
+	public function update_form_values() {
 
 		global $wpdb;
-		// Retrieve the serialized form data from the AJAX request
-		$form_data = sanitize_text_field( $_POST['formData'] );
-		$id        = intval( $_POST['id'] );
 
-		// Parse the serialized form data
-		parse_str( stripslashes( $form_data ), $fields );
+		if ( isset( $_POST['nonceupdate'] ) && isset( $_POST['id'] ) && isset( $_POST['formData'] ) ) {
+			$nonce     = isset( $_POST['nonceupdate'] ) ? sanitize_text_field( wp_unslash( $_POST['nonceupdate'] ) ) : '';
+			$id        = isset( $_POST['id'] ) ? intval( $_POST['id'] ) : null;
+			$form_data = isset( $_POST['formData'] ) ? sanitize_text_field( wp_unslash( $_POST['formData'] ) ) : '';
 
-		if ( ! $id ) {
-			exit;
-		}
+			if ( ! wp_verify_nonce( $nonce, 'nonceupdate' ) ) {
+				die( 'Busted!' );
+			}
 
-		// Check permissions
-		if ( ! current_user_can( 'manage_options' ) ) {
-			exit;
-		}
+			if ( ! empty( $_POST['id'] ) && ! empty( $_POST['formData'] ) ) {
 
-		// Check for nonce security
-		if ( ! wp_verify_nonce( $_POST['nonceupdate'], 'nonceupdate' ) ) {
-			die( 'Busted!' );
-		}
+				// Parse the serialized form data.
+				parse_str( stripslashes( $form_data ), $fields );
 
-		$status = $wpdb->update(
-			$this->table_name,
-			array( 'form_values' => serialize( $fields ) ),
-			array( 'id' => $id )
-		);
+				// Check permissions.
+				if ( ! current_user_can( 'manage_options' ) ) {
+					exit;
+				}
 
-		if ( $status === false ) {
-			// An error occurred, send an error response
-			$error_message = $wpdb->last_error;
-			wp_send_json_error( array( 'message' => $error_message ) );
-		} else {
-			// Update was successful, send a success response
-			wp_send_json_success(
-				array(
-					'message'          => 'Update successful!',
-					'fieldsfromupdate' => $fields,
-				)
-			);
+				$where = array(
+					'id' => $id,
+				);
+				$data  = array(
+					'form_values' => serialize( $fields ),
+				);
+
+				// Phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$status = $wpdb->update( $this->table_name, $data, $where );
+
+				if ( false === $status ) {
+					// An error occurred, send an error response.
+					$error_message = $wpdb->last_error;
+					wp_send_json_error( array( 'message' => $error_message ) );
+				} else {
+					// Update was successful, send a success response.
+					wp_send_json_success(
+						array(
+							'message'          => 'Update successful!',
+							'fieldsfromupdate' => $fields,
+						)
+					);
+				}
+			}
 		}
 	}
-
 
 	/**
 	 * Save entry when a Divi form is submitted
 	 */
-	function add_new_post( $processed_fields_values, $et_contact_error, $contact_form_info ) {
+	public function add_new_post( $processed_fields_values, $et_contact_error, $contact_form_info ) {
 
 		global $wpdb;
 
@@ -177,11 +195,11 @@ class Adas_Divi_Public {
 			return;
 		}
 
-		// Serialize the array data
+		// Serialize the array data.
 		$form_values = serialize( $processed_fields_values );
 		$page_id     = get_the_ID();
 
-		// page submitted on details
+		// page submitted on details.
 		$page_id         = $page_id;
 		$page_name       = get_the_title( $page_id );
 		$page_url        = get_permalink( $page_id );
@@ -190,7 +208,8 @@ class Adas_Divi_Public {
 		$read_date       = null;
 		$contact_form_id = sanitize_text_field( $contact_form_info['contact_form_id'] );
 
-		// Insert the serialized data into the database
+		// Insert the serialized data into the database.
+		// Phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->insert(
 			$this->table_name,
 			array(
@@ -216,7 +235,6 @@ class Adas_Divi_Public {
 		);
 	}
 
-
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 */
@@ -224,7 +242,6 @@ class Adas_Divi_Public {
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/adas-divi-public.css', array(), $this->version, 'all' );
 	}
-
 
 	/**
 	 * Register the JavaScript for the public-facing side of the site.
