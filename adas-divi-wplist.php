@@ -73,6 +73,8 @@ class Adas_Main_List_Table extends WP_List_Table {
 
 	/**
 	 * How many items to show on a single page.
+	 *
+	 * @var int|string
 	 */
 	private $per_page = 10;
 
@@ -136,6 +138,7 @@ class Adas_Main_List_Table extends WP_List_Table {
 
 
 	/**
+	 * Prepare items for the list table
 	 *
 	 * @global wpdb $wpdb
 	 * @uses $this->_column_headers
@@ -158,7 +161,7 @@ class Adas_Main_List_Table extends WP_List_Table {
 
 		$data = $this->entries_data();
 
-		// usort($data, array($this, 'usort_reorder'));
+		// usort($data, array($this, 'usort_reorder'))
 
 		$current_page = $this->get_pagenum();
 
