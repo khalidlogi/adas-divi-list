@@ -88,7 +88,7 @@ class Adas_Divi_Settings {
 		add_settings_section(
 			'cliowp_settings_page_section2',
 			'<span class="label_setting label-primary"><i class="fas fa-paint-brush"></i>
-            ' . esc_html__( 'Style', 'adasdividb' ) . '</span>',
+			' . esc_html__( 'Style', 'adasdividb' ) . '</span>',
 			null,
 			$this->menu_slug
 		);
@@ -211,8 +211,8 @@ class Adas_Divi_Settings {
 		$value = isset( $opt ) && $opt == 1 ? 1 : '0';
 		?>
 <input class="form-control Enable_data_saving_checkbox" type="checkbox" name="Enable_data_saving_checkbox" value="1"
-    <?php checked( 1, $value ); ?>>
-<?php
+		<?php checked( 1, $value ); ?>>
+		<?php
 	}
 
 
@@ -268,16 +268,16 @@ class Adas_Divi_Settings {
 </option>
 
 <select name="divi_form_id_setting[]" class="divi_form_select_id_setting" multiple>
-    <?php
+			<?php
 			foreach ( $results_formids as $form_id ) {
 				$option_value = esc_attr( $form_id->contact_form_id );
 				echo "<option value='" . esc_attr( $option_value ) . "' " . esc_attr( $this->cliowp_multiselected( $selected_values, $option_value ) ) . '>
-                Form ID: ' . esc_html( $option_value ) . '</option>';
+				Form ID: ' . esc_html( $option_value ) . '</option>';
 			}
 			?>
 </select>
 
-<?php
+			<?php
 		} else {
 
 			$message      = esc_html__( 'Currently, no data has been submitted. Kindly submit at least one form using Divi Contact Form.', 'adasdividb' );
@@ -305,7 +305,7 @@ class Adas_Divi_Settings {
 	public function color1_html() {
 		?>
 <input type="color" name="khdivi_bg_color" value="<?php echo esc_attr( get_option( 'khdivi_bg_color' ) ); ?>">
-<?php
+		<?php
 	}
 
 
@@ -315,7 +315,7 @@ class Adas_Divi_Settings {
 	public function color_html2() {
 		?>
 <input type="color" name="khdivi_text_color" value="<?php echo esc_attr( get_option( 'khdivi_text_color' ) ); ?>">
-<?php
+		<?php
 	}
 
 
@@ -325,7 +325,7 @@ class Adas_Divi_Settings {
 	public function color_html3() {
 		?>
 <input type="color" name="khdivi_label_color" value="<?php echo esc_attr( get_option( 'khdivi_label_color' ) ); ?>">
-<?php
+		<?php
 	}
 
 
@@ -335,8 +335,8 @@ class Adas_Divi_Settings {
 	public function color_exportbg_html() {
 		?>
 <input type="color" name="khdivi_exportbg_color"
-    value="<?php echo esc_attr( get_option( 'khdivi_exportbg_color' ) ); ?>">
-<?php
+	value="<?php echo esc_attr( get_option( 'khdivi_exportbg_color' ) ); ?>">
+		<?php
 	}
 
 
@@ -346,18 +346,18 @@ class Adas_Divi_Settings {
 	public function settings_page_html() {
 		?>
 <div class="wrap">
-    <h1>
-        <?php echo esc_attr( $this->page_title ); ?>
-    </h1>
-    <form action="<?php echo esc_attr( $this->form_action ); ?>" method="POST">
-        <?php
+	<h1>
+		<?php echo esc_attr( $this->page_title ); ?>
+	</h1>
+	<form action="<?php echo esc_attr( $this->form_action ); ?>" method="POST">
+		<?php
 				settings_fields( $this->option_group );
 				do_settings_sections( $this->menu_slug );
 				submit_button( esc_html__( 'Save Settings', 'adasdividb' ), 'primary', 'adas-divi-submit-button' );
 		?>
-    </form>
+	</form>
 </div>
-<?php
+		<?php
 	}
 }
 

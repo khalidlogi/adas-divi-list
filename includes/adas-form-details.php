@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Adas Admin subpage
  */
@@ -54,14 +53,14 @@ class Adas_Form_Details {
 		$list_table->prepare_items();
 		?>
 <div class="wrap">
-    <h2>Contact form ID:
-        <?php echo esc_html( $this->form_id ); ?>
-    </h2>
-    <form method="post" action="">
-        <?php $list_table->display(); ?>
-    </form>
+	<h2>Contact form ID:
+		<?php echo esc_html( $this->form_id ); ?>
+	</h2>
+	<form method="post" action="">
+		<?php $list_table->display(); ?>
+	</form>
 </div>
-<?php
+		<?php
 	}
 }
 

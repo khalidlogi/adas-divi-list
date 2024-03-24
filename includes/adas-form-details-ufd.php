@@ -78,7 +78,7 @@ class Adas_Form_Details_Ufd {
 		);
 
 		if ( ! $results ) {
-			error_log( 'Database error: ' );
+
 			return null;
 		}
 

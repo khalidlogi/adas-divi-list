@@ -22,6 +22,7 @@
  */
 class Adas_Divi_Public {
 
+
 	private $table_name;
 	private $plugin_name;
 	private $version;

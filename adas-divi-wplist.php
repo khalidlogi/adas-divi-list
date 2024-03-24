@@ -116,8 +116,6 @@ class Adas_Main_List_Table extends WP_List_Table {
 	 * @param string $column_name The name/slug of the column to be processed.
 	 * @return string Text or HTML to be placed inside the column <td>.
 	 */
-
-	// Here you should add all the columns you want to diplay values for.
 	protected function column_default( $item, $column_name ) {
 		return $item[ $column_name ];
 	}
